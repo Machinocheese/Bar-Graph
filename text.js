@@ -47,15 +47,7 @@ function getMousePos(canvas, evt) {
         };
 }
 
-/*function writeMessage(canvas, message) {
-        var context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width / 2, canvas.height / 2);
-        context.font = '18pt Calibri';
-        context.fillStyle = 'black';
-        context.fillText(message, 10, 25);
-}*/
-
-function writeMessage(text){
+/*function writeMessage(text){ --> this function is for writing ON the canvas.
 	var canvas = document.getElementById("myCanvas");
 	var context = canvas.getContext('2d');
 	context.clearRect(0,0,300,300);
@@ -78,8 +70,14 @@ function writeMessage(text){
 		}
 	}
 	context.fillText(message, 10, y);
+}*/
 
-
+function writeMessage(text){
+	var message = text[0], i;
+	for(i = 1; i < text.length; i++){
+		message += ", " + text[i];
+	}
+	document.getElementById('outputbox').value = message;
 }
 
 function drawBarGraph(range, strings, numbers){
@@ -88,16 +86,15 @@ function drawBarGraph(range, strings, numbers){
 	var i, j;
 	var boundaries = [];
 
-	var textBoxWidth = 300;
 	var gapWidth = 20;
-	var barWidth = ((c.width - textBoxWidth) / range.length) - gapWidth;
+	var barWidth = (c.width / range.length) - gapWidth;
 	var height, fraction, x, text;
 
 	for(i = 0; i < range.length; i++){
 		fraction = range[i] / parseFloat(range[0]);
 		height = c.height * fraction;
-		x = gapWidth * (i + 1) + barWidth * i + textBoxWidth;
-		ctx.rect(x, c.height - height, barWidth, height);
+		x = gapWidth * (i + 1) + barWidth * i;
+		//ctx.rect(x, c.height - height, barWidth, height);
 		var boundary = {
 			left: x,
 			right: x + barWidth,
@@ -107,17 +104,21 @@ function drawBarGraph(range, strings, numbers){
 
 		boundaries.push(boundary);
 
-		ctx.font = "30px Arial";
+		/*ctx.font = "30px Arial";
 
 		text = range[i] + "/" + range[0];
-		ctx.fillText(text, x + barWidth / 2 - ctx.measureText(text).width / 2, c.height - 5);
+		ctx.fillText(text, x + barWidth / 2 - ctx.measureText(text).width / 2, c.height - 5);*/
 	}
-	ctx.stroke();
+	//ctx.stroke();
+
+	//animation(boundaries);
 	
 	for(i = 0; i < boundaries.length; i++){
 		console.log(i);
 		outputRectangle(boundaries[i]);
 	}
+
+	//delay it so that you can't prematurely hover? idk
 
 	handler = function(evt) {
 		var c = document.getElementById("myCanvas");
@@ -153,11 +154,80 @@ function reset(){
 	canvas.removeEventListener('mousemove', handler, false);
 }
 
+var globalBoundary = {
+			left: 0,
+			right: 100,
+			top: 200,
+			bottom: 0
+};
+
+var recHeight;
+var updateSpeed;
+
+function animation(){
+	
+	var canvas = document.getElementById("myCanvas");
+	var context = canvas.getContext('2d');
+	
+	var boundaries = [];
+	var boundary = {
+		left: 20,
+		right: 550,
+		bottom: 0,
+		top: 300
+	};
+	boundaries.push(boundary);
+	boundary = {
+		left: 570,
+		right: 1100,
+		bottom: 0,
+		top: 150,
+	};
+	boundaries.push(boundary);
+	var i;
+
+		globalBoundary = boundaries[0];
+		recHeight = 0;
+		updateSpeed = 60;
+		requestAnimationFrame(draw);
+
+		context.save()
+		context.globalCompositeOperation = "destination-out";
+		context.restore();
+
+		globalBoundary = boundaries[1];
+		recHeight = 0;
+		updateSpeed = 60;
+		requestAnimationFrame(draw);
+	/*var canvas = document.getElementById("myCanvas");
+	var context = canvas.getContext('2d');
+	context.rect(0, canvas.height - 200, 100, 200);
+	context.stroke();*/
+}
+
+function draw() {
+		var canvas = document.getElementById("myCanvas");
+		var context = canvas.getContext('2d');
+		context.beginPath();
+		context.clearRect(globalBoundary.left,globalBoundary.bottom,globalBoundary.right - globalBoundary.left,globalBoundary.top);
+		context.rect(globalBoundary.left, canvas.height - recHeight, globalBoundary.right - globalBoundary.left, recHeight);
+		context.stroke();
+		recHeight += globalBoundary.top / updateSpeed;
+
+		if(recHeight === globalBoundary.top + globalBoundary.top / updateSpeed)
+			recHeight += 1; //break the loop that forms
+		else if(recHeight > globalBoundary.top)
+			recHeight = globalBoundary.top;
+
+		if(recHeight <= globalBoundary.top){
+			requestAnimationFrame(draw);
+		}
+
+}
+
 function myFunction(){ //problems include clicking button twice.
 
 	document.getElementById("theButton").disabled = true;
-	
-
 
 	var str = document.getElementById("textbox").value.trim();
 	
