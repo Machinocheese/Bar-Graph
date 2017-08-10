@@ -118,8 +118,6 @@ function drawBarGraph(range, strings, numbers){
 		outputRectangle(boundaries[i]);
 	}
 
-	//delay it so that you can't prematurely hover? idk
-
 	handler = function(evt) {
 		var c = document.getElementById("myCanvas");
         var mousePos = getMousePos(c, evt);
@@ -149,8 +147,6 @@ function reset(){
 	var context = canvas.getContext('2d');
 	context.clearRect(0,0,canvas.width,canvas.height);
 	context.beginPath();
-	//context.globalCompositeOperation ="source-over";
-	//context.globalAlpha = 1;
 	canvas.removeEventListener('mousemove', handler, false);
 }
 
@@ -163,6 +159,7 @@ var globalBoundary = {
 
 var recHeight;
 var updateSpeed;
+var globalCanvas;
 
 function animation(){
 	
@@ -186,36 +183,62 @@ function animation(){
 	boundaries.push(boundary);
 	var i;
 
+		globalCanvas = canvas;
 		globalBoundary = boundaries[0];
 		recHeight = 0;
 		updateSpeed = 60;
 		requestAnimationFrame(draw);
 
-		context.save()
-		context.globalCompositeOperation = "destination-out";
-		context.restore();
+		var rect = canvas.getBoundingClientRect();
+		console.log(rect.top, rect.right, rect.bottom, rect.left);
 
-		globalBoundary = boundaries[1];
+		var canvas2 = document.createElement("CANVAS");
+		canvas2.style.position = "absolute";
+		canvas2.style.left = rect.left + "px";
+		canvas2.style.top = 536 + "px";
+		canvas2.style.width= 1102 + "px"; //1102
+		canvas2.style.height= 302 + "px";
+		var ctx = canvas2.getContext("2d");
+		//globalCanvas = canvas2;
+		ctx.fillRect(0,0,canvas2.width,canvas2.height);
+		document.body.appendChild(canvas2);
+/*
+		context.rect(20, 0, 530, 300);
+		context.stroke();
+		context.save();
+		context.globalCompositeOperation = "destination-out";
+
+		context.beginPath();
+		context.rect(570, 150, 530, 150);
+		context.stroke();*/
+		
+		/*globalBoundary = boundaries[1];
 		recHeight = 0;
 		updateSpeed = 60;
 		requestAnimationFrame(draw);
 	/*var canvas = document.getElementById("myCanvas");
 	var context = canvas.getContext('2d');
-	context.rect(0, canvas.height - 200, 100, 200);
-	context.stroke();*/
+	context.fillRect(0,0,canvas.width, canvas.height);
+	//context.clearRect(10,, 100, 100);
+	context.clearRect(globalBoundary.left,canvas.height - globalBoundary.top,globalBoundary.right - globalBoundary.left,globalBoundary.top);	
+	//context.rect(0, canvas.height - 200, 100, 200);
+	//context.stroke();*/
 }
 
 function draw() {
-		var canvas = document.getElementById("myCanvas");
+		console.log("HI");
+		var canvas = globalCanvas;
 		var context = canvas.getContext('2d');
 		context.beginPath();
-		context.clearRect(globalBoundary.left,globalBoundary.bottom,globalBoundary.right - globalBoundary.left,globalBoundary.top);
+		//bottom or top switch
+		context.clearRect(globalBoundary.left,canvas.height - globalBoundary.top,globalBoundary.right - globalBoundary.left,globalBoundary.top);
 		context.rect(globalBoundary.left, canvas.height - recHeight, globalBoundary.right - globalBoundary.left, recHeight);
 		context.stroke();
 		recHeight += globalBoundary.top / updateSpeed;
 
-		if(recHeight === globalBoundary.top + globalBoundary.top / updateSpeed)
+		if(recHeight === globalBoundary.top + globalBoundary.top / updateSpeed){
 			recHeight += 1; //break the loop that forms
+		}
 		else if(recHeight > globalBoundary.top)
 			recHeight = globalBoundary.top;
 
@@ -264,8 +287,6 @@ function myFunction(){ //problems include clicking button twice.
 	}
 
 	range.sort(function(a, b){return b-a});
-
-	//document.getElementById("stats").innerHTML = output;
 
 	drawBarGraph(range, strings, numbers);
 }
