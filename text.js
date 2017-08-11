@@ -1,5 +1,8 @@
 var handler;
 
+/* this function takes the input string and eliminates troublesome characters,
+like / \ | or { }, characters which generally don't mean much in a string 
+other than for grammar purposes */
 function processString(string){
 	string = string.replace(/,/g, "");
 	string = string.replace(/\./g, "");
@@ -16,6 +19,8 @@ function processString(string){
 	return string;
 }
 
+/*this function finds the alphabetical position
+of a new string in an existing array */
 function getPosition(string, array){
 	var position = 0;
 	for(i = 0; i < array.length; i++){
@@ -26,12 +31,16 @@ function getPosition(string, array){
 	return position;
 }
 
+/*debugging process for rectangle class */
 function outputRectangle(rectangle){
 	console.log("Rectangle Left: " + rectangle.left);
 	console.log("Rectangle Right: " + rectangle.right);
 	console.log("Rectangle Bottom: " + rectangle.bottom);
 	console.log("Rectangle Top: " + rectangle.top);
 }
+
+/*finds out if the "point" or mouse position is hovering over
+a bar in the bar graph */
 function intersect(rectangle, point){
 	if(point.x > rectangle.left && point.x < rectangle.right &&
 		point.y > rectangle.bottom && point.y < rectangle.top)
@@ -39,6 +48,7 @@ function intersect(rectangle, point){
 	return false;
 }
 
+/*gets the mouse position off the canvas */
 function getMousePos(canvas, evt) {
         var rect = canvas.getBoundingClientRect();
         return {
@@ -47,31 +57,7 @@ function getMousePos(canvas, evt) {
         };
 }
 
-/*function writeMessage(text){ --> this function is for writing ON the canvas.
-	var canvas = document.getElementById("myCanvas");
-	var context = canvas.getContext('2d');
-	context.clearRect(0,0,300,300);
-	context.font = '18pt Calibri';
-	context.fillStyle ='black';
-	var message = "", i, y = 25;
-	for(i = 0; i < text.length; i++){
-		if(context.measureText(text[i]).width > 290){
-			text[i] = text[i].substring(0, 25) + "...";
-		}
-		if(context.measureText(message + ", " + text[i]).width > 290){
-			context.fillText(message, 10, y);
-			y += 30;
-			message = text[i];
-		} else {
-			if(i === 0)
-				message += text[i];
-			else
-				message += ", " + text[i];
-		}
-	}
-	context.fillText(message, 10, y);
-}*/
-
+/*creates output message for textarea */
 function writeMessage(text){
 	var message = text[0], i;
 	for(i = 1; i < text.length; i++){
@@ -80,6 +66,7 @@ function writeMessage(text){
 	document.getElementById('outputbox').value = message;
 }
 
+/*draws the bar graph for words */
 function drawBarGraph(range, strings, numbers){
 	var c = document.getElementById("myCanvas");
 	var ctx = c.getContext("2d");
@@ -90,11 +77,11 @@ function drawBarGraph(range, strings, numbers){
 	var barWidth = (c.width / range.length) - gapWidth;
 	var height, fraction, x, text;
 
+	/*creates the number of bars necessary for the graph */
 	for(i = 0; i < range.length; i++){
 		fraction = range[i] / parseFloat(range[0]);
 		height = c.height * fraction;
 		x = gapWidth * (i + 1) + barWidth * i;
-		//ctx.rect(x, c.height - height, barWidth, height);
 		var boundary = {
 			left: x,
 			right: x + barWidth,
@@ -109,17 +96,15 @@ function drawBarGraph(range, strings, numbers){
 		text = range[i] + "/" + range[0];
 		ctx.fillText(text, x + barWidth / 2 - ctx.measureText(text).width / 2, c.height - 5);*/
 	}
-	//ctx.stroke();
 
-	//animation(boundaries);
+	animation(boundaries);
 	
 	for(i = 0; i < boundaries.length; i++){
 		console.log(i);
 		outputRectangle(boundaries[i]);
 	}
 
-	//delay it so that you can't prematurely hover? idk
-
+	/*a listener to track mouse activity */
 	handler = function(evt) {
 		var c = document.getElementById("myCanvas");
         var mousePos = getMousePos(c, evt);
@@ -134,7 +119,7 @@ function drawBarGraph(range, strings, numbers){
         			if(numbers[j] === range[i])
         				text.push(strings[j]);
         		}
-        		console.log(text.join());
+        		//console.log(text.join());
         		writeMessage(text);
         	}
         }
@@ -143,88 +128,70 @@ function drawBarGraph(range, strings, numbers){
 	c.addEventListener('mousemove', handler, false);
 }
 
+/*allows for the canvas to be refreshed and program to be restarted */
 function reset(){
 	document.getElementById("theButton").disabled = false;
 	var canvas = document.getElementById("myCanvas");
 	var context = canvas.getContext('2d');
 	context.clearRect(0,0,canvas.width,canvas.height);
 	context.beginPath();
-	//context.globalCompositeOperation ="source-over";
-	//context.globalAlpha = 1;
 	canvas.removeEventListener('mousemove', handler, false);
 }
 
-var globalBoundary = {
-			left: 0,
-			right: 100,
-			top: 200,
-			bottom: 0
-};
+var globalBoundary;
+var globalRecHeight;
 
-var recHeight;
 var updateSpeed;
 
-function animation(){
+function animation(boundaries){
 	
 	var canvas = document.getElementById("myCanvas");
 	var context = canvas.getContext('2d');
+	globalBoundary = boundaries;
+	globalRecHeight = [];
+	updateSpeed = 60;
 	
-	var boundaries = [];
-	var boundary = {
-		left: 20,
-		right: 550,
-		bottom: 0,
-		top: 300
-	};
-	boundaries.push(boundary);
-	boundary = {
-		left: 570,
-		right: 1100,
-		bottom: 0,
-		top: 150,
-	};
-	boundaries.push(boundary);
 	var i;
-
-		globalBoundary = boundaries[0];
-		recHeight = 0;
-		updateSpeed = 60;
-		requestAnimationFrame(draw);
-
-		context.save()
-		context.globalCompositeOperation = "destination-out";
-		context.restore();
-
-		globalBoundary = boundaries[1];
-		recHeight = 0;
-		updateSpeed = 60;
-		requestAnimationFrame(draw);
-	/*var canvas = document.getElementById("myCanvas");
-	var context = canvas.getContext('2d');
-	context.rect(0, canvas.height - 200, 100, 200);
-	context.stroke();*/
+	for(i = 0; i < globalBoundary.length; i++){
+		globalRecHeight.push(0);
+	}
+		
+	requestAnimationFrame(draw);
 }
 
+/*this creates a rectangle and erases for the next animation frame call
+Difficulties: requestAnimationFrame is asynchronous, so I couldn't create rectangle
+after rangle.
+for some reason I can't call draw a second time w/o one overriding the other... I tried
+layering canvases, multiple draw calls, but nothing worked, so I resorted to just
+one draw call that does eevrything*/
 function draw() {
+		console.log("HI");
 		var canvas = document.getElementById("myCanvas");
 		var context = canvas.getContext('2d');
+		var i;
 		context.beginPath();
-		context.clearRect(globalBoundary.left,globalBoundary.bottom,globalBoundary.right - globalBoundary.left,globalBoundary.top);
-		context.rect(globalBoundary.left, canvas.height - recHeight, globalBoundary.right - globalBoundary.left, recHeight);
+		context.clearRect(0,0,canvas.width, canvas.height);
+		context.fillStyle = "#C0C0C0";
+		for(i = 0; i < globalBoundary.length; i++){
+			context.fillRect(globalBoundary[i].left, canvas.height - globalRecHeight[i], globalBoundary[i].right - globalBoundary[i].left, globalRecHeight[i] + 1);
+			globalRecHeight[i] += globalBoundary[i].top / updateSpeed;
+		}
 		context.stroke();
-		recHeight += globalBoundary.top / updateSpeed;
+		
+		if(globalRecHeight[0] === globalBoundary[0].top + globalBoundary[0].top / updateSpeed){
+			globalRecHeight[0] += 1; //break the loop that forms
+			playing = false;
+		}
+		else if(globalRecHeight[0] > globalBoundary[0].top)
+			globalRecHeight[0] = globalBoundary[0].top;
 
-		if(recHeight === globalBoundary.top + globalBoundary.top / updateSpeed)
-			recHeight += 1; //break the loop that forms
-		else if(recHeight > globalBoundary.top)
-			recHeight = globalBoundary.top;
-
-		if(recHeight <= globalBoundary.top){
+		if(globalRecHeight[0] <= globalBoundary[0].top){
 			requestAnimationFrame(draw);
 		}
-
 }
 
+/* the "main" function */
 function myFunction(){ //problems include clicking button twice.
 
 	document.getElementById("theButton").disabled = true;
@@ -265,7 +232,36 @@ function myFunction(){ //problems include clicking button twice.
 
 	range.sort(function(a, b){return b-a});
 
-	//document.getElementById("stats").innerHTML = output;
-
 	drawBarGraph(range, strings, numbers);
+	console.log("HERE IT IS");
+	
+	for(i = 0; i < numbers.length; i++){
+		if(range[0] === numbers[i])
+			document.getElementById("stats").innerHTML = "Most overused word: " + strings[i];
+	}
 }
+
+/*function writeMessage(text){ --> this function is for writing ON the canvas.
+	var canvas = document.getElementById("myCanvas");
+	var context = canvas.getContext('2d');
+	context.clearRect(0,0,300,300);
+	context.font = '18pt Calibri';
+	context.fillStyle ='black';
+	var message = "", i, y = 25;
+	for(i = 0; i < text.length; i++){
+		if(context.measureText(text[i]).width > 290){
+			text[i] = text[i].substring(0, 25) + "...";
+		}
+		if(context.measureText(message + ", " + text[i]).width > 290){
+			context.fillText(message, 10, y);
+			y += 30;
+			message = text[i];
+		} else {
+			if(i === 0)
+				message += text[i];
+			else
+				message += ", " + text[i];
+		}
+	}
+	context.fillText(message, 10, y);
+}*/

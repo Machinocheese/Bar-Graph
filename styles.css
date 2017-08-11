@@ -1,13 +1,32 @@
 html{
-	text-align:center;
+	background-image: url("blackwood.jpg");
 }
-canvas{
-
+h1{
+	color: #ffffff;
+}
+p{
+	color: #ffffff;
+}
+#center{
+	text-align: center;
+	font-family: Helvetica;
 }
 #textbox{
 	font-size:14pt;
 }
-
+#outputbox{
+	height: 296px;
+	width: 300px;
+	position: absolute;
+	left: 57.375px;
+	top: 536px;
+	margin-bottom: 1cm;
+}
+#myCanvas{
+	position: absolute;
+	left: 363.8125px;
+	top: 536px;
+}
 button {
 	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
 	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;

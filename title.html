@@ -5,14 +5,21 @@
 		<title> Text Analyzer </title>
 	</head>
 <body>
+
+<div id="center">
 <h1> Input your shit here. </h1>
 
-<textarea id="textbox" cols="90" rows="16"> </textarea>
+<textarea id="textbox" cols="90" rows="16"> Praise be...</textarea>
+<p id="stats"> Here's where your stats should be outputted. </p>
 
-<p id="test"> Here's where your stats should be outputted. </p>
+<button type="button" id="theButton" onclick="myFunction()">Try it</button> <!-- myFunction() -->
+<button type="button" onclick="reset()">Reset</button><br/> <br/>
+<button type="button" id="readMore" style="display:none;"></button>
+</div>
 
-<button type="button" onclick="myFunction()">Try it</button> <br/> <br/>
-<canvas id="myCanvas" width="960" height="300"> Canvas </canvas>
+<textarea id="outputbox"> Praise Me? </textarea>
+<canvas id="myCanvas" width="1100" height="300" style="border:1px solid #000000;"> Canvas 
+</canvas>
 
 <script src = "text.js">
 </script>
